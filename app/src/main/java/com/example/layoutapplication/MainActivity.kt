@@ -1,10 +1,15 @@
 package com.example.layoutapplication
 
+import android.icu.text.Transliterator.Position
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.NestedScrollingParent
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.layoutapplication.databinding.ActivityMainBinding
@@ -43,23 +48,49 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val adapter = ArrayAdapter.createFromResource(
+            this,
+            R.array.num_people,
+            android.R.layout.simple_spinner_item
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerNumberOfPeople.adapter = adapter
+
+        var numOfPeopleSelected = 0
+
+        binding.spinnerNumberOfPeople.onItemClickListener =
+            object : AdapterView.OnItemClickListener {
+
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    numOfPeopleSelected = position
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                }
+            }
+
         binding.btnClean.setOnClickListener() {
             println("Mirian" + binding.tieTotal.text)
-            println("Mirian" + binding.tieNumPeople.text)
+
         }
 
         binding.btnDone.setOnClickListener {
             val totalTableTemp = binding.tieTotal.text
-            val nPeopleTemp = binding.tieNumPeople.text
 
-            if (totalTableTemp?.isEmpty() == true ||
-                nPeopleTemp?.isEmpty() == true
+
+            if (totalTableTemp?.isEmpty() == true
             ) {
                 Snackbar.make(binding.tieTotal, "Preencha todos os campos", Snackbar.LENGTH_LONG)
                     .show()
             } else {
                 val totalTable: Float = totalTableTemp.toString().toFloat()
-                val nPeople: Int = nPeopleTemp.toString().toInt()
+                val nPeople: Int = numOfPeopleSelected
 
                 val totalTemp = totalTable / nPeople
                 val tips = totalTemp * percentage / 100
@@ -72,15 +103,13 @@ class MainActivity : AppCompatActivity() {
             binding.btnClean.setOnClickListener {
                 binding.tvResult.text = ""
                 binding.tieTotal.setText("")
-                binding.tieNumPeople.setText("")
                 binding.rgOptionOne.isChecked = false
                 binding.rgOptionTwo.isChecked = false
                 binding.rgOptionThree.isChecked = false
 
 
-
             }
 
-            }
         }
     }
+}
